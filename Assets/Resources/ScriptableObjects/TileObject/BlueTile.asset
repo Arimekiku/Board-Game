@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a62bce8d81a6a745b4066cdd8c829bd, type: 3}
+  m_Name: BlueTile
+  m_EditorClassIdentifier: 
+  DefaultSprite: {fileID: -503355665, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
+  BottomSprite: {fileID: 1103471755, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
+  BottomLeftSprite: {fileID: 1603608701, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
+  BottomRightSprite: {fileID: 601793178, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
+  BottomTopSprite: {fileID: 488437699, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
+  BottomRightLeftSprite: {fileID: -463166938, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
+  BottomTopRightSprite: {fileID: 1551679176, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
+  BottomTopLeftSprite: {fileID: -1256630809, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
+  BottomTopRightLeftSprite: {fileID: 875386436, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
+  LeftSprite: {fileID: -1312762827, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
+  LeftRightSprite: {fileID: 1726402408, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
+  TopSprite: {fileID: 408496634, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
+  TopLeftSprite: {fileID: 590088982, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
+  TopRightSprite: {fileID: -324878268, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
+  TopLeftRightSprite: {fileID: -1832095900, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
+  RightSprite: {fileID: -1129311501, guid: 08765912dbf7a294392cb62bbe82dd97, type: 3}
