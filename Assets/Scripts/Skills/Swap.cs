@@ -43,7 +43,7 @@ public class Swap : Skill
                 break;
         }
 
-        _nodesInRange[0].TileOnNode.UpdateSprite();
+        //_nodesInRange[0].TileOnNode.UpdateSprite();
 
         _uses--;
         _skillUI.UpdateAmount(_uses);
@@ -54,7 +54,7 @@ public class Swap : Skill
     {
         int redCount = 0, blueCount = 0, yellowCount = 0, greenCount = 0;
 
-        foreach (Tile neighbour in tile.GetNeighbours())
+        foreach (Tile neighbour in tile.Neighbours)
         {
             switch (neighbour.Type)
             {

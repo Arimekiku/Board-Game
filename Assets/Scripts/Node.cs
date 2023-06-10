@@ -1,23 +1,28 @@
+using System;
 using UnityEngine;
 
 public class Node : MonoBehaviour
 {
-    [SerializeField] private Tile _tileOnNode;
+    public Tile TileOnNode { get; private set; }
+    public Vector2Int Coordinates { get; private set; }
 
     private SpriteRenderer _nodeRenderer;
-    private Vector2Int _coordinates;
 
-    public Tile TileOnNode => _tileOnNode;
-    public Vector2Int Coordinates => _coordinates;
+    private readonly Color _unselected = new Color(Color.white.r, Color.white.g, Color.white.b, 0);
+    private readonly Color _selected = new Color(Color.white.r, Color.white.g, Color.white.b, 50f / 255f);
 
-    private void Awake()
-    {
-        _nodeRenderer = GetComponentInChildren<SpriteRenderer>();
-    }
+    private void Awake() => _nodeRenderer = GetComponentInChildren<SpriteRenderer>();
 
-    public void SetCoordinates(int x, int y) => _coordinates = new(x, y);
-    public void SetTile(Tile tile) => _tileOnNode = tile;
-    public void ClearTile() => _tileOnNode = null;
-    public void SetSelected() => _nodeRenderer.color = new(_nodeRenderer.color.r, _nodeRenderer.color.g, _nodeRenderer.color.b, 50f / 255f);
-    public void SetUnselected() => _nodeRenderer.color = new(_nodeRenderer.color.r, _nodeRenderer.color.g, _nodeRenderer.color.b, 0);
+    public void SetCoordinates(int x, int y) 
+    { 
+        if (x < 0 || y < 0)
+            throw new IndexOutOfRangeException("Invalid coordinates");
+
+        Coordinates = new Vector2Int(x, y);
+    } 
+    
+    public void SetTile(Tile tile) => TileOnNode = tile;
+    public void ClearTile() => TileOnNode = null;
+    public void SetSelected() => _nodeRenderer.color = _selected;
+    public void SetUnselected() => _nodeRenderer.color = _unselected;
 }

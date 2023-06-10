@@ -7,14 +7,9 @@ public class Tile : MonoBehaviour
 {
     [SerializeField] private TileTypes _type;
     [SerializeField] private TileData _data;
-    [SerializeField] private ParticleSystem _particlesGreen;
-    [SerializeField] private ParticleSystem _particlesBlue;
-    [SerializeField] private ParticleSystem _particlesRed;
-    [SerializeField] private ParticleSystem _particlesYellow;
+    [SerializeField] private ParticleSystem _particles;
     [SerializeField] private AudioSource _tileSource;
 
-    private List<Tile> _neighbours = new();
-    private List<bool> _waveFunctionNeighbours = new() { false, false, false, false };
     private SpriteRenderer _renderer;
     private WaveFunctionCollapse _spriteHandler;
     private bool _excludePointSystem;
@@ -25,6 +20,7 @@ public class Tile : MonoBehaviour
 
     public int AmountOfPoints { get; private set; }
     public bool IsDestroyable { get; private set; }
+    public HashSet<Tile> Neighbours { get; private set; } = new HashSet<Tile>();
 
     public TileTypes Type => _type;
     public WaveFunctionCollapse SpriteHandler => _spriteHandler;
@@ -33,7 +29,7 @@ public class Tile : MonoBehaviour
     {
         AmountOfPoints = 10;
 
-        _spriteHandler = new();
+        _spriteHandler = new WaveFunctionCollapse();
         _spriteHandler.UpdateSpriteList(_data);
         _renderer = GetComponentInChildren<SpriteRenderer>();
     }
@@ -43,68 +39,68 @@ public class Tile : MonoBehaviour
         IsDestroyable = false;
 
         LeanTween.cancel(gameObject);
-        transform.position = new(transform.position.x, Mathf.RoundToInt(transform.position.y));
-        Vector3 endPosition = new(transform.position.x, transform.position.y - 1);
+        transform.position = new Vector2(transform.position.x, Mathf.RoundToInt(transform.position.y));
+        Vector3 endPosition = new Vector2(transform.position.x, transform.position.y - 1);
 
-        LeanTween.move(gameObject, endPosition, _translationTime).setEaseInOutSine().setOnComplete(() => UpdateSprite());
+        //TODO: make tile change sprite after moving by reasonable way
+        LeanTween.move(gameObject, endPosition, _translationTime).setEaseInOutSine();
     }
 
-    public IEnumerator CheckOnRemovingQueue(Tile tile)
-    {
-        tile.Destroy();
+    public IEnumerator StartRemovingQueue()
+    {   
+        Destroy();
         OnDie.Invoke(AmountOfPoints);
-
+        
         yield return new WaitForSeconds(0.05f);
-
-        ClearNeighbours();
-
-        foreach (Tile neighbour in _neighbours)
-            if (neighbour.Type == _type)
-                StartCoroutine(ContinueRemovingQueue(neighbour, AmountOfPoints + 5));
+        yield return IterateRemovingQueue(this, AmountOfPoints + 5);       
     }
 
-    private IEnumerator ContinueRemovingQueue(Tile tile, int reward)
+    private IEnumerator ContinueRemovingQueue(Tile tile, int currentReward)
     {
         tile.Destroy();
-
-        if (_excludePointSystem == false)
-            OnDie.Invoke(reward);
+        OnDie.Invoke(currentReward);
 
         yield return new WaitForSeconds(0.05f);
-
-        ClearNeighbours();
-
-        foreach (Tile neighbour in _neighbours)
-            if (neighbour.Type == _type)
-                StartCoroutine(ContinueRemovingQueue(neighbour, reward + 5));
+        yield return IterateRemovingQueue(tile, currentReward + 5);
     }
 
-    public void ClearNeighbours() 
+    private IEnumerator IterateRemovingQueue(Tile tile, int currentReward) 
     {
-        foreach (Tile neighbour in _neighbours) 
-            neighbour._neighbours.Remove(this);
+        HashSet<Tile> neighboursCopy = tile.Neighbours; 
+        
+        foreach (Tile neighbour in neighboursCopy) 
+        {
+            if (neighbour.Type == _type) 
+            {
+                yield return new WaitForSeconds(0.1f);
+                StartCoroutine(ContinueRemovingQueue(neighbour, currentReward + 5));
+            }  
+        }    
     }
 
     public void Destroy()
     {
-        //LeanTween.rotateZ(_renderer.gameObject, 360f, 0.1f).setOnComplete(() => Destroy(gameObject));
-        LeanTween.scale(_renderer.gameObject, Vector3.zero, 0.2f).setOnComplete(() => Destroy(gameObject));
+        //Clear the tile from all neighbour tiles lists
+        foreach (Tile neighbour in Neighbours)
+            neighbour.Neighbours.Remove(this);
 
-        switch (_type)
-        {
-            case TileTypes.Red: _particlesRed.Play(); break;
-            case TileTypes.Blue: _particlesBlue.Play(); break;
-            case TileTypes.Green: _particlesGreen.Play(); break;
-            case TileTypes.Yellow: _particlesYellow.Play(); break;
-        }
-
+        //Make all of the visual and audio stuff
+        _particles.transform.SetParent(transform.parent);
+        _particles.Play();
         _tileSource.Play();
+
+        LeanTween.scale(gameObject, Vector3.zero, 0.2f).setDestroyOnComplete(true);
     }
 
+    public void UpdateNeighbourList(HashSet<Tile> newNeighbours)
+    {
+        Neighbours = newNeighbours;
+
+        foreach (Tile tile in Neighbours) 
+            tile.Neighbours.Add(this);
+    } 
+
     public void AllowDestroying() => IsDestroyable = true;
-    public void UpdateSprite() => SpriteHandler.CheckValidatePair(_waveFunctionNeighbours);
     public void PrioritizeOnDestroying() => _excludePointSystem = true;
-    public void UpdateNeighbourList(List<bool> newNeighbours) => _waveFunctionNeighbours = newNeighbours;
     public void UpdateType(TileTypes newType) => _type = newType;
-    public List<Tile> GetNeighbours() => new(_neighbours);
 }

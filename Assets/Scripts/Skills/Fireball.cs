@@ -37,34 +37,34 @@ public class Fireball : Skill
 
         if (currentNode.Coordinates.y < _board.BoardSize.y - 1) 
         {
-            _nodesInRange.Add(_board.GetNode(nodePosition.x, nodePosition.y + 1));
+            _nodesInRange.Add(_board.TryGetNode(nodePosition.x, nodePosition.y + 1));
 
             if (currentNode.Coordinates.y < _board.BoardSize.y - 2)
-                _nodesInRange.Add(_board.GetNode(nodePosition.x, nodePosition.y + 2));
+                _nodesInRange.Add(_board.TryGetNode(nodePosition.x, nodePosition.y + 2));
         }
 
         if (currentNode.Coordinates.y > 0) 
         {
-            _nodesInRange.Add(_board.GetNode(nodePosition.x, nodePosition.y - 1));
+            _nodesInRange.Add(_board.TryGetNode(nodePosition.x, nodePosition.y - 1));
 
             if (currentNode.Coordinates.y > 1)
-                _nodesInRange.Add(_board.GetNode(nodePosition.x, nodePosition.y - 2));
+                _nodesInRange.Add(_board.TryGetNode(nodePosition.x, nodePosition.y - 2));
         }
 
         if (currentNode.Coordinates.x < _board.BoardSize.x - 1) 
         {
-            _nodesInRange.Add(_board.GetNode(nodePosition.x + 1, nodePosition.y));
+            _nodesInRange.Add(_board.TryGetNode(nodePosition.x + 1, nodePosition.y));
 
             if (currentNode.Coordinates.x < _board.BoardSize.x - 2)
-                _nodesInRange.Add(_board.GetNode(nodePosition.x + 2, nodePosition.y));
+                _nodesInRange.Add(_board.TryGetNode(nodePosition.x + 2, nodePosition.y));
         }
 
         if (currentNode.Coordinates.x > 0) 
         {
-            _nodesInRange.Add(_board.GetNode(nodePosition.x - 1, nodePosition.y));
+            _nodesInRange.Add(_board.TryGetNode(nodePosition.x - 1, nodePosition.y));
 
             if (currentNode.Coordinates.y > 1)
-                _nodesInRange.Add(_board.GetNode(nodePosition.x - 2, nodePosition.y));
+                _nodesInRange.Add(_board.TryGetNode(nodePosition.x - 2, nodePosition.y));
         }
 
         _nodesInRange.ForEach(n => n.SetSelected());

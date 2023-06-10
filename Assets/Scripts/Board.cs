@@ -13,13 +13,19 @@ public class Board : MonoBehaviour
     private Vector2Int _boardSize;
 
     private readonly List<Tile> _tilesToInitialize = new();
+    private readonly Vector2Int[] _directions = new Vector2Int[4] 
+    {
+        Vector2Int.left,
+        Vector2Int.right,
+        Vector2Int.down,
+        Vector2Int.up
+    };
 
     public event Action<int> OnTileDied;
     public event Action<int> OnComboPerformed;
     public event Action OnLose;
-    public event Action OnTileHitGround;
 
-    private Vector2 Offset => new((_boardSize.x - 1) * 0.5f, -1 * 0.5f);
+    private Vector2 Offset => new Vector2((_boardSize.x - 1) * 0.5f, -1 * 0.5f);
     public Vector2Int BoardSize => _boardSize;
 
     public void Initialize(Vector2Int boardSize)
@@ -32,7 +38,7 @@ public class Board : MonoBehaviour
             for (int x = 0; x < boardSize.x; x++)
             {
                 Node node = _nodes[x, y] = Instantiate(_nodePrefab, transform);
-                node.transform.localPosition = new(x - Offset.x, y - Offset.y);
+                node.transform.localPosition = new Vector2(x - Offset.x, y - Offset.y);
                 node.name = "Node " + x + " " + y;
                 node.SetCoordinates(x, y);
             }
@@ -62,7 +68,7 @@ public class Board : MonoBehaviour
         transitionHandler.LoadMenu();
     }
 
-    public IEnumerator SpawningCoroutine(HardSkaling currentFun)
+    public IEnumerator SpawningCoroutine(DifficultySkaling currentFun)
     {
         while (true)
         {
@@ -72,7 +78,7 @@ public class Board : MonoBehaviour
         }
     }
 
-    public IEnumerator MovingCoroutine(HardSkaling currentFun)
+    public IEnumerator MovingCoroutine(DifficultySkaling currentFun)
     {
         while (true)
         {
@@ -112,50 +118,39 @@ public class Board : MonoBehaviour
                 {
                     _nodes[x, y].TileOnNode.MakeMove();
                     _nodes[x, y - 1].SetTile(_nodes[x, y].TileOnNode);
-                    _nodes[x, y - 1].TileOnNode.UpdateNeighbourList(GetNodeTileNeighbours(x, y - 1));
                     _nodes[x, y].ClearTile();
 
                     if (_nodes[x, 0] == _nodes[x, y - 1])
                     {
                         _nodes[x, y - 1].TileOnNode.AllowDestroying();
                         _soundHandler.PlayTileCollidesWallSound();
-                        OnTileHitGround.Invoke();
+                        UpdateTileNode(_nodes[x, y - 1]);
                     } 
                     else if (_nodes[x, y - 2].TileOnNode != null)
                     {
                         _nodes[x, y - 1].TileOnNode.AllowDestroying();
                         _soundHandler.PlayTileCollidesTileSound();
+                        UpdateTileNode(_nodes[x, y - 1]);
                     }
                 }
             }
         }
     }
 
-    private List<bool> GetNodeTileNeighbours(int x, int y) 
+    private void UpdateTileNode(Node node) 
     {
-        List<bool> checker = new();
+        HashSet<Tile> checker = new();
 
-        if (y >= _boardSize.y)
-            checker.Add(false);
-        else 
-            checker.Add(_nodes[x, y + 1] == null ? false : true);
+        foreach (Vector2Int direction in _directions) 
+        {
+            Node neighbour = TryGetNode(node.Coordinates + direction);
 
-        if (y <= 0)
-            checker.Add(false);
-        else 
-            checker.Add(_nodes[x, y - 1] == null ? false : true);
+            if (neighbour is not null) 
+                if (neighbour.TileOnNode is not null) 
+                        checker.Add(neighbour.TileOnNode);             
+        }
 
-        if (x <= 0)
-            checker.Add(false);
-        else 
-            checker.Add(_nodes[x - 1, y] == null ? false : true);
-
-        if (x >= _boardSize.x)
-            checker.Add(false);
-        else 
-            checker.Add(_nodes[x + 1, y] == null ? false : true);
-
-        return checker;
+        node.TileOnNode.UpdateNeighbourList(checker);
     }
 
     private void InitializeTilesOnBoard()
@@ -186,7 +181,7 @@ public class Board : MonoBehaviour
         OnLose.Invoke();
     }
 
-    public Node GetNode(Tile tile)
+    public Node TryGetNode(Tile tile)
     {
         foreach (Node node in _nodes)
             if (tile == node.TileOnNode)
@@ -195,15 +190,26 @@ public class Board : MonoBehaviour
         throw new ArgumentException();
     }
 
-    public Node GetNode(int x, int y) 
+    public Node TryGetNode(int x, int y) 
     {
         if (x >= _boardSize.x || x < 0)
-            throw new ArgumentException();
+            return null;
         
         if (y >= _boardSize.y || y < 0)
-            throw new ArgumentException();
+            return null;
         
         return _nodes[x, y];
+    }
+
+    public Node TryGetNode(Vector2Int coord) 
+    {
+        if (coord.x >= _boardSize.x || coord.x < 0)
+            return null;
+        
+        if (coord.y >= _boardSize.y || coord.y < 0)
+            return null;
+        
+        return _nodes[coord.x, coord.y];
     }
 
     public List<Node> GetNodesWithTile()

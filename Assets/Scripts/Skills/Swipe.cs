@@ -33,7 +33,7 @@ public class Swipe : Skill
 
         for (int x = 0; x < _board.BoardSize.x; x++) 
         {
-            _nodesInRange.Add(_board.GetNode(x, currentNode.Coordinates.y));
+            _nodesInRange.Add(_board.TryGetNode(x, currentNode.Coordinates.y));
         }
 
         _nodesInRange.ForEach(n => n.SetSelected());

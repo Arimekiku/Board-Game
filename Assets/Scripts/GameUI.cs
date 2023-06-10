@@ -8,18 +8,7 @@ public class GameUI : MonoBehaviour
     [Space, SerializeField] private TextMeshProUGUI _scoreBar;
     [Space, SerializeField] private Toggle _slowmotionSkill;
     [SerializeField] private Slider _slowmotionValue;
-    [Space, SerializeField] private TextMeshProUGUI _timer;
-
-    public void UpdateScoreBar(int amount)
-    {
-        _scoreBar.text = amount.ToString();
-    }
-
-    public void UpdateTimerBar(float amount)
-    {
-        _timer.text = ((int)amount).ToString();
-    }
-
+    
     public void SelectSlowMotionSkill()
     {
         _slowmotionSkill.isOn = false;
@@ -32,8 +21,6 @@ public class GameUI : MonoBehaviour
         _soundHandler.PlayButtonSound(); 
     }
 
-    public void UpdateSlowMotionBar(float value)
-    {
-        _slowmotionValue.value = _slowmotionValue.maxValue - value;
-    }
+    public void UpdateScoreBar(int amount) => _scoreBar.text = amount.ToString();
+    public void UpdateSlowMotionBar(float value) => _slowmotionValue.value = _slowmotionValue.maxValue - value;
 }

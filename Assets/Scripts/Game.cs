@@ -12,23 +12,19 @@ public class Game : MonoBehaviour
     private Skill _selectedSkill;
     private Camera _mainCamera;
     private GameUI _gameUI;
-    private HardSkaling _currentFun;
+    private DifficultySkaling _currentFun = new();
     private int _totalScore = 0;
     private float _currentSlowMotionTime = 0f;
     private bool _performingSlowMotion;
     private bool _isLost;
 
-    public TimerBehaviour _lostTimer;
-
     private void Awake()
     {
-        _lostTimer = new(60);
         _gameUI = GetComponent<GameUI>();
         _mainCamera = Camera.main;
 
         _board.Initialize(_boardSize);
 
-        _lostTimer.OnTimerEnd += Lose;
         _board.OnTileDied += UpdateScore;
         _board.OnLose += Lose;
         _board.OnComboPerformed += UpdateSkills;
@@ -36,11 +32,6 @@ public class Game : MonoBehaviour
 
     private void Update()
     {
-        _lostTimer.UpdateTime(Time.deltaTime);
-
-        if (_lostTimer.IsStopped == false)
-            _gameUI.UpdateTimerBar(_lostTimer.RemainingTime);
-
         if (_performingSlowMotion)
         {
             _currentSlowMotionTime += Time.unscaledDeltaTime;
@@ -141,7 +132,7 @@ public class Game : MonoBehaviour
             if (node.TileOnNode.IsDestroyable || _performingSlowMotion == true) 
             {
                 node.TileOnNode.OnDie += UpdateScore;
-                StartCoroutine(node.TileOnNode.CheckOnRemovingQueue(node.TileOnNode));
+                StartCoroutine(node.TileOnNode.StartRemovingQueue());
             }  
         }
     }
@@ -164,12 +155,6 @@ public class Game : MonoBehaviour
             _swapSkill.IncreaseUses();
         else if (combo > 3)
             _swipeSkill.IncreaseUses();
-
-        if (combo > 0)
-            _lostTimer.AdjustTime(combo);
-
-        if (combo == 0)
-            _lostTimer.AdjustTime(-1);
     }
 
     private void Lose()
@@ -177,7 +162,6 @@ public class Game : MonoBehaviour
         _board.StopAllCoroutines();
         StartCoroutine(_board.ClearNodes(_transitionHandler));
 
-        _lostTimer.StopTimer();
         _isLost = true;
 
         if (_totalScore > PlayerPrefs.GetInt("highScore"))
@@ -191,7 +175,6 @@ public class Game : MonoBehaviour
 
         _gameUI.UpdateScoreBar(0);
         _gameUI.UpdateSlowMotionBar(0);
-        _gameUI.UpdateTimerBar(60);
 
         _swipeSkill.Initialize();
         _swapSkill.Initialize();
@@ -201,18 +184,9 @@ public class Game : MonoBehaviour
     public void Initialize()
     {
         _isLost = false;
-        _board.OnTileHitGround += StartTimer;
-
-        _currentFun = new();
-
+        
+        _currentFun.Initialize();
         StartCoroutine(_board.SpawningCoroutine(_currentFun));
         StartCoroutine(_board.MovingCoroutine(_currentFun));
-    }
-
-    private void StartTimer()
-    {
-        _lostTimer.RestartTimer();
-
-        _board.OnTileHitGround -= StartTimer;
     }
 }
