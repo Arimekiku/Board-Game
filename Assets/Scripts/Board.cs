@@ -139,15 +139,14 @@ public class Board : MonoBehaviour
 
     private void UpdateTileNode(Node node) 
     {
-        HashSet<Tile> checker = new();
+        List<Tile> checker = new();
 
         foreach (Vector2Int direction in _directions) 
         {
             Node neighbour = TryGetNode(node.Coordinates + direction);
 
-            if (neighbour is not null) 
-                if (neighbour.TileOnNode is not null) 
-                        checker.Add(neighbour.TileOnNode);             
+            if (neighbour?.TileOnNode is not null) 
+                checker.Add(neighbour.TileOnNode);             
         }
 
         node.TileOnNode.UpdateNeighbourList(checker);
@@ -173,10 +172,8 @@ public class Board : MonoBehaviour
     private void CalculateLoseOption()
     {
         for (int x = 0; x < _boardSize.x; x++)
-        {
             if (_nodes[x, _boardSize.y - 1].TileOnNode == null)
                 return;
-        }
 
         OnLose.Invoke();
     }

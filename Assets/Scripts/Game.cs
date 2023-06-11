@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Game : MonoBehaviour
@@ -83,20 +85,40 @@ public class Game : MonoBehaviour
         TrySelectSkill(_fireballSkill);
     }
 
+    public void ReloadGame()
+    {
+        _totalScore = 0;
+        _currentSlowMotionTime = 0f;
+
+        _gameUI.UpdateScoreBar(0);
+        _gameUI.UpdateSlowMotionBar(0);
+
+        _swipeSkill.Initialize();
+        _swapSkill.Initialize();
+        _fireballSkill.Initialize();
+    }
+
+    public void Initialize()
+    {
+        _isLost = false;
+        
+        _currentFun.Initialize();
+        StartCoroutine(_board.SpawningCoroutine(_currentFun));
+        StartCoroutine(_board.MovingCoroutine(_currentFun));
+    }
+
     private void TrySelectSkill(Skill skillToSelect)
     {
         if (Input.GetKeyDown(skillToSelect.SelectCode) && skillToSelect.Uses > 0)
         {
             if (skillToSelect.IsSelected)
             {
-                if (_selectedSkill != null)
-                    _selectedSkill.Deselect();  
+                _selectedSkill?.Deselect();  
                 _selectedSkill = null;
             }
             else
             {
-                if (_selectedSkill != null)
-                    _selectedSkill.Deselect();
+                _selectedSkill?.Deselect();
 
                 _selectedSkill = skillToSelect;
                 _selectedSkill.Select();
@@ -132,7 +154,7 @@ public class Game : MonoBehaviour
             if (node.TileOnNode.IsDestroyable || _performingSlowMotion == true) 
             {
                 node.TileOnNode.OnDie += UpdateScore;
-                StartCoroutine(node.TileOnNode.StartRemovingQueue());
+                StartCoroutine(BeginRemovingQueue(node.TileOnNode));
             }  
         }
     }
@@ -168,25 +190,37 @@ public class Game : MonoBehaviour
             PlayerPrefs.SetInt("highScore", _totalScore);
     }
 
-    public void ReloadGame()
-    {
-        _totalScore = 0;
-        _currentSlowMotionTime = 0f;
+    private IEnumerator BeginRemovingQueue(Tile tile)
+    {   
+        foreach (Tile tileToRemove in GetTilesToRemove(tile)) 
+        {
+            tileToRemove.Destroy();
 
-        _gameUI.UpdateScoreBar(0);
-        _gameUI.UpdateSlowMotionBar(0);
+            yield return new WaitForSeconds(0.05f);
 
-        _swipeSkill.Initialize();
-        _swapSkill.Initialize();
-        _fireballSkill.Initialize();
+            UpdateScore(tileToRemove.AmountOfPoints);
+        }     
     }
-
-    public void Initialize()
+    
+    private HashSet<Tile> GetTilesToRemove(Tile firstTile) 
     {
-        _isLost = false;
-        
-        _currentFun.Initialize();
-        StartCoroutine(_board.SpawningCoroutine(_currentFun));
-        StartCoroutine(_board.MovingCoroutine(_currentFun));
+        HashSet<Tile> tilesToRemove = new HashSet<Tile>();
+
+        Queue<Tile> tilesInQueue = new Queue<Tile>();
+        tilesInQueue.Enqueue(firstTile);
+        Tile currentTile;
+
+        while (tilesInQueue.Count > 0) 
+        {
+            currentTile = tilesInQueue.Dequeue();
+            foreach (Tile neighbour in currentTile.Neighbours) 
+                if (tilesToRemove.Contains(neighbour) is false) 
+                    tilesInQueue.Enqueue(neighbour);
+
+            if (currentTile.Type == firstTile.Type)
+                tilesToRemove.Add(currentTile);
+        }
+
+        return tilesToRemove;
     }
 }

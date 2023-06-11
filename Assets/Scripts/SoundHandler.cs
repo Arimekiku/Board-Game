@@ -53,15 +53,15 @@ public class SoundHandler : MonoBehaviour
 
         if (sound.isOn)
         {
-            UIAudio.mute = false;
-            ClickAudio.mute = false;
-            BoardAudio.mute = false;
+            _UIAudio.mute = false;
+            _clickAudio.mute = false;
+            _boardAudio.mute = false;
             return;
         }
 
-        UIAudio.mute = true;
-        ClickAudio.mute = true;
-        BoardAudio.mute = true;
+        _UIAudio.mute = true;
+        _clickAudio.mute = true;
+        _boardAudio.mute = true;
     }
 
     public void UpdateMusic(Toggle music)
@@ -73,15 +73,10 @@ public class SoundHandler : MonoBehaviour
 
         if (music.isOn)
         {
-            MusicAudio.mute = false;
+            _musicAudio.mute = false;
             return;
         }
 
-        MusicAudio.mute = true;
+        _musicAudio.mute = true;
     }
-
-    public AudioSource ClickAudio => _clickAudio;
-    public AudioSource UIAudio => _UIAudio;
-    public AudioSource MusicAudio => _musicAudio;
-    public AudioSource BoardAudio => _boardAudio;
 }

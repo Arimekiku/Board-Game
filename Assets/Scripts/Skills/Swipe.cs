@@ -15,11 +15,8 @@ public class Swipe : Skill
 
         foreach (Node node in _nodesInRange) 
         {
-            if (node.TileOnNode != null)
-            {
-                node.TileOnNode.Destroy();
-                node.ClearTile();
-            }
+            node.TileOnNode?.Destroy();
+            node.ClearTile();
         }
 
         _uses--;
@@ -32,9 +29,7 @@ public class Swipe : Skill
         ClearSelectedArea();
 
         for (int x = 0; x < _board.BoardSize.x; x++) 
-        {
             _nodesInRange.Add(_board.TryGetNode(x, currentNode.Coordinates.y));
-        }
 
         _nodesInRange.ForEach(n => n.SetSelected());
     }

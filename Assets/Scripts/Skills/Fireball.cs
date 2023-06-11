@@ -13,11 +13,8 @@ public class Fireball : Skill
     {
         foreach (Node node in _nodesInRange)
         {
-            if (node.TileOnNode != null)
-            {
-                node.TileOnNode.Destroy();
-                node.ClearTile();
-            }     
+            node.TileOnNode?.Destroy();
+            node.ClearTile();   
         }
 
         _uses--;

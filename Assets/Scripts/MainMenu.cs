@@ -5,10 +5,7 @@ public class MainMenu : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _highScore;
 
-    private void Start()
-    {
-        UpdateHighScore();
-    }
+    private void Start() => UpdateHighScore();
 
     public void UpdateHighScore()
     {
