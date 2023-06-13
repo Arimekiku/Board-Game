@@ -2,11 +2,6 @@ using UnityEngine;
 
 public class Swap : Skill
 {
-    [SerializeField] private TileData _redData;
-    [SerializeField] private TileData _greenData;
-    [SerializeField] private TileData _blueData;
-    [SerializeField] private TileData _yellowData;
-
     private TileTypes _selectedType;
 
     public override void Initialize()
@@ -27,22 +22,6 @@ public class Swap : Skill
         _selectedType = CalculateType(_nodesInRange[0].TileOnNode);
 
         _nodesInRange[0].TileOnNode.UpdateType(_selectedType);
-        switch (_selectedType)
-        {
-            case TileTypes.Green:
-                _nodesInRange[0].TileOnNode.SpriteHandler.UpdateSpriteList(_greenData);
-                break;
-            case TileTypes.Blue:
-                _nodesInRange[0].TileOnNode.SpriteHandler.UpdateSpriteList(_blueData);
-                break;
-            case TileTypes.Yellow:
-                _nodesInRange[0].TileOnNode.SpriteHandler.UpdateSpriteList(_yellowData);
-                break;
-            case TileTypes.Red:
-                _nodesInRange[0].TileOnNode.SpriteHandler.UpdateSpriteList(_redData);
-                break;
-        }
-
         //_nodesInRange[0].TileOnNode.UpdateSprite();
 
         _uses--;

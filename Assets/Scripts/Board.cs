@@ -12,7 +12,7 @@ public class Board : MonoBehaviour
     private Node[,] _nodes;
     private Vector2Int _boardSize;
 
-    private readonly List<Tile> _tilesToInitialize = new();
+    private readonly List<Tile> _tilesToInitialize = new List<Tile>();
     private readonly Vector2Int[] _directions = new Vector2Int[4] 
     {
         Vector2Int.left,
@@ -21,7 +21,6 @@ public class Board : MonoBehaviour
         Vector2Int.up
     };
 
-    public event Action<int> OnComboPerformed;
     public event Action OnLose;
 
     private Vector2 Offset => new Vector2((_boardSize.x - 1) * 0.5f, -1 * 0.5f);
@@ -154,9 +153,9 @@ public class Board : MonoBehaviour
     {
         foreach (Tile tile in _tilesToInitialize)
         {
-            Vector2Int randomNodesColumn = new(UnityEngine.Random.Range(0, _nodes.GetLength(0)), _nodes.GetLength(1) - 1);
+            Vector2Int randomNodesColumn = new Vector2Int(UnityEngine.Random.Range(0, _nodes.GetLength(0)), _nodes.GetLength(1) - 1);
             while (_nodes[randomNodesColumn.x, randomNodesColumn.y].TileOnNode != null)
-                randomNodesColumn = new(UnityEngine.Random.Range(0, _nodes.GetLength(0)), _nodes.GetLength(1) - 1);
+                randomNodesColumn = new Vector2Int(UnityEngine.Random.Range(0, _nodes.GetLength(0)), _nodes.GetLength(1) - 1);
 
             tile.transform.localPosition = randomNodesColumn - Offset;
             _nodes[randomNodesColumn.x, randomNodesColumn.y].SetTile(tile);

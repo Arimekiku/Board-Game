@@ -4,7 +4,6 @@ using UnityEngine;
 public class Tile : MonoBehaviour
 {
     [SerializeField] private TileTypes _type;
-    [SerializeField] private TileData _data;
     [SerializeField] private ParticleSystem _particles;
     [SerializeField] private AudioSource _tileSource;
 
@@ -12,7 +11,6 @@ public class Tile : MonoBehaviour
 
     public int AmountOfPoints { get; private set; }
     public bool IsDestroyable { get; private set; }
-    public WaveFunctionCollapse SpriteHandler { get; private set; }
     public List<Tile> Neighbours { get; private set; } = new List<Tile>();
     public TileTypes Type => _type;
 
@@ -22,8 +20,6 @@ public class Tile : MonoBehaviour
     {
         AmountOfPoints = 10;
 
-        SpriteHandler = new WaveFunctionCollapse();
-        SpriteHandler.UpdateSpriteList(_data);
         _renderer = GetComponentInChildren<SpriteRenderer>();
     }
 

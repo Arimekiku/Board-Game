@@ -26,9 +26,7 @@ public class Game : MonoBehaviour
         _mainCamera = Camera.main;
 
         _board.Initialize(_boardSize);
-
         _board.OnLose += Lose;
-        _board.OnComboPerformed += UpdateSkills;
     }
 
     private void Update()
