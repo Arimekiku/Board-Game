@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,26 +9,21 @@ public class Tile : MonoBehaviour
     [SerializeField] private AudioSource _tileSource;
 
     private SpriteRenderer _renderer;
-    private WaveFunctionCollapse _spriteHandler;
-    private bool _excludePointSystem;
-
-    private readonly float _translationTime = 0.1f;
-
-    public event Action<int> OnDie;
 
     public int AmountOfPoints { get; private set; }
     public bool IsDestroyable { get; private set; }
+    public WaveFunctionCollapse SpriteHandler { get; private set; }
     public List<Tile> Neighbours { get; private set; } = new List<Tile>();
-
     public TileTypes Type => _type;
-    public WaveFunctionCollapse SpriteHandler => _spriteHandler;
+
+    private const float TRANSLATION_TIME = 0.1f;
 
     public void Initialize()
     {
         AmountOfPoints = 10;
 
-        _spriteHandler = new WaveFunctionCollapse();
-        _spriteHandler.UpdateSpriteList(_data);
+        SpriteHandler = new WaveFunctionCollapse();
+        SpriteHandler.UpdateSpriteList(_data);
         _renderer = GetComponentInChildren<SpriteRenderer>();
     }
 
@@ -42,7 +36,7 @@ public class Tile : MonoBehaviour
         Vector3 endPosition = new Vector2(transform.position.x, transform.position.y - 1);
 
         //TODO: make tile change sprite after moving by reasonable way
-        LeanTween.move(gameObject, endPosition, _translationTime).setEaseInOutSine();
+        LeanTween.move(gameObject, endPosition, TRANSLATION_TIME).setEaseInOutSine();
     }
 
     public void Destroy()
@@ -62,7 +56,6 @@ public class Tile : MonoBehaviour
             tile.Neighbours.Add(this);
     } 
 
-    public void AllowDestroying() => IsDestroyable = true;
-    public void PrioritizeOnDestroying() => _excludePointSystem = true;
+    public void AllowDestroying() => IsDestroyable = true;    
     public void UpdateType(TileTypes newType) => _type = newType;
 }

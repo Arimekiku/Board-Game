@@ -11,10 +11,10 @@ public class Game : MonoBehaviour
     [SerializeField] private Swap _swapSkill;
     [SerializeField] private Swipe _swipeSkill;
 
-    private Skill _selectedSkill;
+    private Skill _currentSkill;
     private Camera _mainCamera;
     private GameUI _gameUI;
-    private DifficultySkaling _currentFun = new();
+    private DifficultySkaling _currentFun = new DifficultySkaling();
     private int _totalScore = 0;
     private float _currentSlowMotionTime = 0f;
     private bool _performingSlowMotion;
@@ -27,7 +27,6 @@ public class Game : MonoBehaviour
 
         _board.Initialize(_boardSize);
 
-        _board.OnTileDied += UpdateScore;
         _board.OnLose += Lose;
         _board.OnComboPerformed += UpdateSkills;
     }
@@ -40,8 +39,7 @@ public class Game : MonoBehaviour
 
             _gameUI.UpdateSlowMotionBar(_currentSlowMotionTime);
         }
-
-        if (_performingSlowMotion == false && _currentSlowMotionTime > 0f)
+        else if (_currentSlowMotionTime > 0f) 
         {
             _currentSlowMotionTime -= Time.unscaledDeltaTime / 2f;
 
@@ -52,16 +50,16 @@ public class Game : MonoBehaviour
         {
             RaycastHit2D hit = Physics2D.Raycast(_mainCamera.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
         
-            if (_selectedSkill == null)
+            if (_currentSkill == null)
                 OnDeselectedSkillClick(hit);
             else
                 OnSelectedSkillClick(hit);
         }
 
-        if (Input.GetMouseButtonDown(1) && _selectedSkill != null)
+        if (Input.GetMouseButtonDown(1) && _currentSkill != null)
         {
-            _selectedSkill.Deselect();
-            _selectedSkill = null;
+            _currentSkill.Deselect();
+            _currentSkill = null;
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -85,24 +83,24 @@ public class Game : MonoBehaviour
         TrySelectSkill(_fireballSkill);
     }
 
-    public void ReloadGame()
+    public void Initialize()
     {
+        gameObject.SetActive(true);
+
         _totalScore = 0;
         _currentSlowMotionTime = 0f;
 
-        _gameUI.UpdateScoreBar(0);
-        _gameUI.UpdateSlowMotionBar(0);
-
+        _gameUI.Initialize();
         _swipeSkill.Initialize();
         _swapSkill.Initialize();
         _fireballSkill.Initialize();
+        _currentFun.Initialize();
     }
 
-    public void Initialize()
+    public void StartGame()
     {
         _isLost = false;
         
-        _currentFun.Initialize();
         StartCoroutine(_board.SpawningCoroutine(_currentFun));
         StartCoroutine(_board.MovingCoroutine(_currentFun));
     }
@@ -112,16 +110,15 @@ public class Game : MonoBehaviour
         if (Input.GetKeyDown(skillToSelect.SelectCode) && skillToSelect.Uses > 0)
         {
             if (skillToSelect.IsSelected)
-            {
-                _selectedSkill?.Deselect();  
-                _selectedSkill = null;
+            {   
+                _currentSkill.Deselect();
+                _currentSkill = null;
             }
             else
             {
-                _selectedSkill?.Deselect();
-
-                _selectedSkill = skillToSelect;
-                _selectedSkill.Select();
+                _currentSkill?.Deselect();
+                _currentSkill = skillToSelect;
+                _currentSkill.Select();
             }
         }
     }
@@ -130,14 +127,14 @@ public class Game : MonoBehaviour
     {
         if (hit.collider == null) 
         {
-            _selectedSkill.Deselect();
+            _currentSkill.Deselect();
             return;
         }
                     
         if (hit.collider.TryGetComponent(out Node node))
         {
-            _selectedSkill.Activate();
-            _selectedSkill = null;
+            _currentSkill.Activate();
+            _currentSkill = null;
         }
     }
 
@@ -152,10 +149,7 @@ public class Game : MonoBehaviour
                 return;
 
             if (node.TileOnNode.IsDestroyable || _performingSlowMotion == true) 
-            {
-                node.TileOnNode.OnDie += UpdateScore;
                 StartCoroutine(BeginRemovingQueue(node.TileOnNode));
-            }  
         }
     }
 

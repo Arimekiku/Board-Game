@@ -24,9 +24,9 @@ public class Swipe : Skill
         Deselect();
     }
 
-    protected override void UpdateNodeList(Node currentNode)
+    protected override void UpdateSelectedList(Node currentNode)
     {
-        ClearSelectedArea();
+        ClearSelectedList();
 
         for (int x = 0; x < _board.BoardSize.x; x++) 
             _nodesInRange.Add(_board.TryGetNode(x, currentNode.Coordinates.y));

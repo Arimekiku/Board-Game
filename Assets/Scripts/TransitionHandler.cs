@@ -28,17 +28,15 @@ public class TransitionHandler : MonoBehaviour
     private void TurnOnGame()
     {
         _mainMenu.gameObject.SetActive(false);
-        _game.gameObject.SetActive(true);
-        _game.ReloadGame();
-        LeanTween.alphaCanvas(_transitionBetweenPanels, 0, 1f).setOnComplete(() => { _transitionBetweenPanels.blocksRaycasts = false; _game.Initialize(); });
+        _game.Initialize();
+        LeanTween.alphaCanvas(_transitionBetweenPanels, 0, 1f).setOnComplete(() => { _transitionBetweenPanels.blocksRaycasts = false; _game.StartGame(); });
     }
 
     private void TurnOnMenu()
     {
         _game.gameObject.SetActive(false);
         _credits.SetActive(false);
-        _mainMenu.gameObject.SetActive(true);
-        _mainMenu.UpdateHighScore();
+        _mainMenu.Initialize();
         LeanTween.alphaCanvas(_transitionBetweenPanels, 0, 1f).setOnComplete(() => _transitionBetweenPanels.blocksRaycasts = false);
     }
 

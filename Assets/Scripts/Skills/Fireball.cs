@@ -22,12 +22,12 @@ public class Fireball : Skill
         Deselect();
     }
 
-    protected override void UpdateNodeList(Node currentNode)
+    protected override void UpdateSelectedList(Node currentNode)
     {
         if (currentNode == null)
             return;
 
-        ClearSelectedArea();
+        ClearSelectedList();
 
         _nodesInRange.Add(currentNode);
         Vector2Int nodePosition = currentNode.Coordinates;

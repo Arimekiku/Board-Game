@@ -102,12 +102,12 @@ public class Swap : Skill
         return max == redCount ? TileTypes.Red : max == greenCount ? TileTypes.Green : max == yellowCount ? TileTypes.Yellow : TileTypes.Blue;
     }
 
-    protected override void UpdateNodeList(Node onNode)
+    protected override void UpdateSelectedList(Node onNode)
     {
         if (onNode == null)
             return;
 
-        ClearSelectedArea();
+        ClearSelectedList();
 
         _nodesInRange.Add(onNode);
         _nodesInRange.ForEach(n => n.SetSelected());

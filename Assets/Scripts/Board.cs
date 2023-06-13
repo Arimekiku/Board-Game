@@ -21,7 +21,6 @@ public class Board : MonoBehaviour
         Vector2Int.up
     };
 
-    public event Action<int> OnTileDied;
     public event Action<int> OnComboPerformed;
     public event Action OnLose;
 
@@ -47,17 +46,15 @@ public class Board : MonoBehaviour
 
     public IEnumerator ClearNodes(TransitionHandler transitionHandler)
     {
+        //Clear all tiles that about to spawn
         foreach (Tile tile in _tilesToInitialize) 
-        {
-            tile.PrioritizeOnDestroying();
             tile.Destroy();
-        }
 
         _tilesToInitialize.Clear();
 
+        //Clear all tiles on field
         foreach (Node node in GetNodesWithTile())
         {
-            node.TileOnNode.PrioritizeOnDestroying();
             node.TileOnNode.Destroy();
 
             yield return new WaitForSeconds(0.05f);
@@ -65,6 +62,7 @@ public class Board : MonoBehaviour
             node.ClearTile();
         }
 
+        //Load main menu
         transitionHandler.LoadMenu();
     }
 

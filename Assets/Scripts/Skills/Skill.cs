@@ -10,7 +10,7 @@ public abstract class Skill : MonoBehaviour
 
     protected int _uses;
     protected bool _isSelected;
-    protected List<Node> _nodesInRange = new();
+    protected List<Node> _nodesInRange = new List<Node>();
     protected SkillUI _skillUI;
     protected KeyCode _selectCode;
     protected Board _board;
@@ -38,7 +38,7 @@ public abstract class Skill : MonoBehaviour
 
         if (hit.collider == null) 
         {
-            ClearSelectedArea();
+            ClearSelectedList();
             return;
         }
 
@@ -47,12 +47,12 @@ public abstract class Skill : MonoBehaviour
             if (_previousSelectedNode != node)
             {
                 _previousSelectedNode = node;
-                UpdateNodeList(_previousSelectedNode);
+                UpdateSelectedList(_previousSelectedNode);
             }
         }
     }
 
-    protected void ClearSelectedArea()
+    protected void ClearSelectedList()
     {
         _nodesInRange.ForEach(n => n.SetUnselected());
         _nodesInRange.Clear();
@@ -74,12 +74,12 @@ public abstract class Skill : MonoBehaviour
     {
         _isSelected = false;
         _skillUI.DeselectSkill();
-        ClearSelectedArea();
+        ClearSelectedList();
     }
 
     public abstract void Initialize();
     public abstract void Activate();
 
     protected abstract void ShowSkill();
-    protected abstract void UpdateNodeList(Node node);
+    protected abstract void UpdateSelectedList(Node node);
 }
